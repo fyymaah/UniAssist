@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Board - UniAssist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-customization">
+            <button id="theme-toggle">⚙️ Settings</button>
+        </div>
+        <h1 class="main-title">UniAssist</h1>
+    </header>
+    
+    <main>
+        <!-- Text to Speech Section -->
+        <div class="tool-container">
+            <h3>📝 Type & Speak</h3>
+            <textarea id="custom-text" rows="3" cols="50" placeholder="Type your message here..."></textarea>
+            <div class="tool-controls">
+                <button onclick="speakText(document.getElementById('custom-text').value)">🔊 Speak Text</button>
+                <button onclick="clearText('custom-text')">🗑️ Clear</button>
+                <button onclick="savePhrase()">💾 Save Phrase</button>
+            </div>
+            
+            <div id="saved-phrases" class="saved-phrases">
+                <!-- Saved phrases will appear here -->
+            </div>
+        </div>
+
+        <!-- Quick Keywords Section with Categories -->
+        <div class="tool-container">
+            <h3>⚡ Communication Categories</h3>
+            
+            <div class="category-tabs">
+                <button class="category-tab active" onclick="showCategory('basic')">Basic Needs</button>
+                <button class="category-tab" onclick="showCategory('feelings')">Feelings</button>
+                <button class="category-tab" onclick="showCategory('medical')">Medical</button>
+                <button class="category-tab" onclick="showCategory('social')">Social</button>
+            </div>
+            
+            <div id="basic-category" class="category-content active">
+                <div class="comm-grid">
+                    <button class="comm-btn" onclick="speakText('I need water')">💧 I need water</button>
+                    <button class="comm-btn" onclick="speakText('I need help')">🆘 I need help</button>
+                    <button class="comm-btn" onclick="speakText('I am hungry')">🍔 I am hungry</button>
+                    <button class="comm-btn" onclick="speakText('I am thirsty')">🥤 I am thirsty</button>
+                    <button class="comm-btn" onclick="speakText('I need the bathroom')">🚽 I need the bathroom</button>
+                    <button class="comm-btn" onclick="speakText('I need to rest')">🛌 I need to rest</button>
+                    <button class="comm-btn" onclick="speakText('I need to eat')">🍽️ I need to eat</button>
+                    <button class="comm-btn" onclick="speakText('I need to sleep')">😴 I need to sleep</button>
+                </div>
+            </div>
+            
+            <div id="feelings-category" class="category-content">
+                <div class="comm-grid">
+                    <button class="comm-btn" onclick="speakText('I am happy')">😊 I am happy</button>
+                    <button class="comm-btn" onclick="speakText('I am sad')">😢 I am sad</button>
+                    <button class="comm-btn" onclick="speakText('I am tired')">😴 I am tired</button>
+                    <button class="comm-btn" onclick="speakText('I am scared')">😨 I am scared</button>
+                    <button class="comm-btn" onclick="speakText('I am confused')">😕 I am confused</button>
+                    <button class="comm-btn" onclick="speakText('I am cold')">🥶 I am cold</button>
+                    <button class="comm-btn" onclick="speakText('I am hot')">🥵 I am hot</button>
+                    <button class="comm-btn" onclick="speakText('I am in pain')">🤕 I am in pain</button>
+                </div>
+            </div>
+            
+            <div id="medical-category" class="category-content">
+                <div class="comm-grid">
+                    <button class="comm-btn" onclick="speakText('I need medicine')">💊 I need medicine</button>
+                    <button class="comm-btn" onclick="speakText('I need a doctor')">👨‍⚕️ I need a doctor</button>
+                    <button class="comm-btn" onclick="speakText('I feel dizzy')">🌀 I feel dizzy</button>
+                    <button class="comm-btn" onclick="speakText('I have a headache')">🤕 I have a headache</button>
+                    <button class="comm-btn" onclick="speakText('I need a break')">☕ I need a break</button>
+                    <button class="comm-btn" onclick="speakText('I need help')">🆘 Emergency</button>
+                </div>
+            </div>
+            
+            <div id="social-category" class="category-content">
+                <div class="comm-grid">
+                    <button class="comm-btn" onclick="speakText('I want to go home')">🏠 I want to go home</button>
+                    <button class="comm-btn" onclick="speakText('I want to talk')">💬 I want to talk</button>
+                    <button class="comm-btn" onclick="speakText('Thank you')">🙏 Thank you</button>
+                    <button class="comm-btn" onclick="speakText('Please')">🤲 Please</button>
+                    <button class="comm-btn" onclick="speakText('Sorry')">😔 Sorry</button>
+                    <button class="comm-btn" onclick="speakText('Yes')">👍 Yes</button>
+                    <button class="comm-btn" onclick="speakText('No')">👎 No</button>
+                    <button class="comm-btn" onclick="speakText('I love you')">❤️ I love you</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="feature-card" style="display: inline-block;">
+                <div class="icon">🏠</div>
+                <h3>Back to Home</h3>
+            </a>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Customize Experience</h3>
+            
+            <label>🌙 Dark Mode:</label>
+            <input type="checkbox" id="dark-mode-toggle">
+            
+            <label>📏 Font Size:</label>
+            <input type="range" id="font-size-slider" min="14" max="24" value="16">
+            <span id="font-size-display">16px</span>
+            
+            <label>🎨 Accent Color:</label>
+            <input type="color" id="accent-color-picker" value="#0056b3">
+            
+            <label>📱 Quick Colors:</label>
+            <div class="color-palette" id="settings-color-palette">
+                <div class="color-swatch" style="background: #0056b3;" onclick="setAccentColor('#0056b3')"></div>
+                <div class="color-swatch" style="background: #00a8cc;" onclick="setAccentColor('#00a8cc')"></div>
+                <div class="color-swatch" style="background: #28a745;" onclick="setAccentColor('#28a745')"></div>
+                <div class="color-swatch" style="background: #ffc107;" onclick="setAccentColor('#ffc107')"></div>
+                <div class="color-swatch" style="background: #dc3545;" onclick="setAccentColor('#dc3545')"></div>
+                <div class="color-swatch" style="background: #6f42c1;" onclick="setAccentColor('#6f42c1')"></div>
+            </div>
+            
+            <button id="reset-settings">🔄 Reset All Settings</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Category switching
+        function showCategory(category) {
+            // Update tabs
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update content
+            document.querySelectorAll('.category-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(category + '-category').classList.add('active');
+        }
+
+        // Save custom phrases
+        function savePhrase() {
+            const text = document.getElementById('custom-text').value.trim();
+            if (text) {
+                let savedPhrases = JSON.parse(localStorage.getItem('savedPhrases') || '[]');
+                savedPhrases.push(text);
+                localStorage.setItem('savedPhrases', JSON.stringify(savedPhrases));
+                displaySavedPhrases();
+                speakText('Phrase saved');
+                document.getElementById('custom-text').value = '';
+            }
+        }
+
+        function displaySavedPhrases() {
+            const container = document.getElementById('saved-phrases');
+            const savedPhrases = JSON.parse(localStorage.getItem('savedPhrases') || '[]');
+            
+            if (savedPhrases.length > 0) {
+                container.innerHTML = '<h4>Saved Phrases:</h4>';
+                savedPhrases.forEach((phrase, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'saved-phrase-btn';
+                    btn.textContent = phrase;
+                    btn.onclick = () => speakText(phrase);
+                    container.appendChild(btn);
+                });
+            }
+        }
+
+        // Load saved phrases on page load
+        document.addEventListener('DOMContentLoaded', displaySavedPhrases);
+    </script>
+</body>
+</html>

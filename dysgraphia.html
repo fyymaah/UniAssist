@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dysgraphia Support - UniAssist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-customization">
+            <button id="theme-toggle">⚙️ Settings</button>
+        </div>
+        <h1 class="main-title">UniAssist</h1>
+    </header>
+    
+    <main>
+        <div class="tool-container">
+            <h3>✍️ Dysgraphia Support Tools</h3>
+            
+            <div class="voice-controls">
+                <button onclick="startDictation()" class="primary-btn">🎤 Start Speaking</button>
+                <button onclick="stopDictation()">⏹️ Stop</button>
+                <button onclick="pauseDictation()">⏸️ Pause</button>
+            </div>
+            
+            <textarea id="dictation-box" rows="10" cols="50" placeholder="Click the microphone and start speaking..."></textarea>
+            
+            <div class="tool-controls">
+                <button onclick="clearText('dictation-box')">🗑️ Clear Text</button>
+                <button onclick="speakText(document.getElementById('dictation-box').value)">🔊 Read Aloud</button>
+                <button onclick="copyToClipboard()">📋 Copy Text</button>
+                <button onclick="saveToFile()">💾 Save as Text</button>
+            </div>
+
+            <div class="word-prediction" id="word-suggestions">
+                <!-- Word suggestions will appear here -->
+            </div>
+
+            <div class="tool-controls">
+                <button onclick="showKeyboard()">⌨️ Show Keyboard</button>
+                <button onclick="increaseFontSize('dictation-box')">📈 Increase Font</button>
+                <button onclick="decreaseFontSize('dictation-box')">📉 Decrease Font</button>
+            </div>
+        </div>
+
+        <!-- Virtual Keyboard (shown on demand) -->
+        <div id="virtual-keyboard" class="virtual-keyboard" style="display: none;">
+            <div class="keyboard-row">
+                <button onclick="insertText('q')">q</button>
+                <button onclick="insertText('w')">w</button>
+                <button onclick="insertText('e')">e</button>
+                <button onclick="insertText('r')">r</button>
+                <button onclick="insertText('t')">t</button>
+                <button onclick="insertText('y')">y</button>
+                <button onclick="insertText('u')">u</button>
+                <button onclick="insertText('i')">i</button>
+                <button onclick="insertText('o')">o</button>
+                <button onclick="insertText('p')">p</button>
+            </div>
+            <div class="keyboard-row">
+                <button onclick="insertText('a')">a</button>
+                <button onclick="insertText('s')">s</button>
+                <button onclick="insertText('d')">d</button>
+                <button onclick="insertText('f')">f</button>
+                <button onclick="insertText('g')">g</button>
+                <button onclick="insertText('h')">h</button>
+                <button onclick="insertText('j')">j</button>
+                <button onclick="insertText('k')">k</button>
+                <button onclick="insertText('l')">l</button>
+            </div>
+            <div class="keyboard-row">
+                <button onclick="insertText('z')">z</button>
+                <button onclick="insertText('x')">x</button>
+                <button onclick="insertText('c')">c</button>
+                <button onclick="insertText('v')">v</button>
+                <button onclick="insertText('b')">b</button>
+                <button onclick="insertText('n')">n</button>
+                <button onclick="insertText('m')">m</button>
+                <button onclick="insertText(' ')">Space</button>
+                <button onclick="backspace()">⌫</button>
+            </div>
+            <button onclick="hideKeyboard()">Close Keyboard</button>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="feature-card" style="display: inline-block;">
+                <div class="icon">🏠</div>
+                <h3>Back to Home</h3>
+            </a>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Customize Experience</h3>
+            
+            <label>🌙 Dark Mode:</label>
+            <input type="checkbox" id="dark-mode-toggle">
+            
+            <label>📏 Font Size:</label>
+            <input type="range" id="font-size-slider" min="14" max="24" value="16">
+            <span id="font-size-display">16px</span>
+            
+            <label>🎨 Accent Color:</label>
+            <input type="color" id="accent-color-picker" value="#0056b3">
+            
+            <label>📱 Quick Colors:</label>
+            <div class="color-palette" id="settings-color-palette">
+                <div class="color-swatch" style="background: #0056b3;" onclick="setAccentColor('#0056b3')"></div>
+                <div class="color-swatch" style="background: #00a8cc;" onclick="setAccentColor('#00a8cc')"></div>
+                <div class="color-swatch" style="background: #28a745;" onclick="setAccentColor('#28a745')"></div>
+                <div class="color-swatch" style="background: #ffc107;" onclick="setAccentColor('#ffc107')"></div>
+                <div class="color-swatch" style="background: #dc3545;" onclick="setAccentColor('#dc3545')"></div>
+                <div class="color-swatch" style="background: #6f42c1;" onclick="setAccentColor('#6f42c1')"></div>
+            </div>
+            
+            <button id="reset-settings">🔄 Reset All Settings</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        let recognition = null;
+        let isPaused = false;
+
+        function startDictation() {
+            if (window.hasOwnProperty('webkitSpeechRecognition')) {
+                recognition = new webkitSpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                recognition.start();
+                isPaused = false;
+                
+                recognition.onresult = function(e) {
+                    if (!isPaused) {
+                        const textarea = document.getElementById('dictation-box');
+                        let finalTranscript = '';
+                        
+                        for (let i = e.resultIndex; i < e.results.length; i++) {
+                            const transcript = e.results[i][0].transcript;
+                            if (e.results[i].isFinal) {
+                                finalTranscript += transcript + ' ';
+                            }
+                        }
+                        
+                        if (finalTranscript) {
+                            textarea.value += finalTranscript;
+                            suggestWords(finalTranscript);
+                        }
+                    }
+                };
+                
+                recognition.onerror = function(e) {
+                    console.error('Speech recognition error:', e.error);
+                    alert("Speech recognition error: " + e.error);
+                };
+                
+                speakText('Listening... Start speaking');
+            } else {
+                alert("Browser not supported for Speech Recognition. Please use Chrome or Edge.");
+            }
+        }
+
+        function stopDictation() {
+            if (recognition) {
+                recognition.stop();
+                speakText('Stopped listening');
+            }
+        }
+
+        function pauseDictation() {
+            isPaused = !isPaused;
+            speakText(isPaused ? 'Paused' : 'Resumed');
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('dictation-box');
+            textarea.select();
+            document.execCommand('copy');
+            speakText('Text copied to clipboard');
+        }
+
+        function saveToFile() {
+            const text = document.getElementById('dictation-box').value;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-text.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+            speakText('File saved');
+        }
+
+        function suggestWords(text) {
+            const words = text.split(' ');
+            const lastWord = words[words.length - 1].toLowerCase();
+            
+            // Simple word suggestions
+            const suggestions = {
+                'hel': ['help', 'hello', 'held'],
+                'tha': ['thank', 'that', 'than'],
+                'ple': ['please', 'plenty', 'pleasure'],
+                'goo': ['good', 'goose', 'google'],
+                'com': ['come', 'community', 'computer']
+            };
+            
+            const prefix = lastWord.substring(0, 3);
+            const suggestionBox = document.getElementById('word-suggestions');
+            
+            if (suggestions[prefix]) {
+                suggestionBox.innerHTML = '';
+                suggestions[prefix].forEach(word => {
+                    const btn = document.createElement('button');
+                    btn.textContent = word;
+                    btn.onclick = () => {
+                        const textarea = document.getElementById('dictation-box');
+                        const words = textarea.value.split(' ');
+                        words[words.length - 1] = word;
+                        textarea.value = words.join(' ') + ' ';
+                        suggestionBox.innerHTML = '';
+                    };
+                    suggestionBox.appendChild(btn);
+                });
+            } else {
+                suggestionBox.innerHTML = '';
+            }
+        }
+
+        function showKeyboard() {
+            document.getElementById('virtual-keyboard').style.display = 'block';
+        }
+
+        function hideKeyboard() {
+            document.getElementById('virtual-keyboard').style.display = 'none';
+        }
+
+        function insertText(char) {
+            const textarea = document.getElementById('dictation-box');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            textarea.value = textarea.value.substring(0, start) + char + textarea.value.substring(end);
+            textarea.selectionStart = textarea.selectionEnd = start + 1;
+            textarea.focus();
+        }
+
+        function backspace() {
+            const textarea = document.getElementById('dictation-box');
+            const start = textarea.selectionStart;
+            if (start > 0) {
+                textarea.value = textarea.value.substring(0, start - 1) + textarea.value.substring(start);
+                textarea.selectionStart = textarea.selectionEnd = start - 1;
+            }
+            textarea.focus();
+        }
+    </script>
+</body>
+</html>

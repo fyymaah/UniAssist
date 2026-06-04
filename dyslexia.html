@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dyslexia Support - UniAssist</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="header-customization">
+            <button id="theme-toggle">⚙️ Settings</button>
+        </div>
+        <h1 class="main-title">UniAssist</h1>
+    </header>
+    
+    <main>
+        <div class="tool-container">
+            <h3>📖 Dyslexia Support - Document Reader</h3>
+            
+            <!-- File Upload Section -->
+            <div class="upload-section">
+                <h4>📤 Upload Document to Read</h4>
+                <div class="upload-controls">
+                    <input type="file" id="file-upload" accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png,.gif">
+                    <button onclick="uploadFile()" class="primary-btn">📂 Upload & Read</button>
+                </div>
+                <p class="supported-formats">Supported: PDF, TXT, DOC, DOCX, JPG, PNG, GIF</p>
+            </div>
+
+            <!-- File Info Display -->
+            <div id="file-info" class="file-info" style="display: none;">
+                <p><strong>File:</strong> <span id="file-name"></span></p>
+                <p><strong>Pages/Images:</strong> <span id="file-pages"></span></p>
+            </div>
+
+            <!-- Text Display Area -->
+            <div class="text-display-area">
+                <div id="text-content" class="text-content" contenteditable="true">
+                    <p>Upload a file or type/paste text here...</p>
+                </div>
+            </div>
+            
+            <!-- Playback Controls -->
+            <div class="playback-controls">
+                <h4>🎵 Playback Controls</h4>
+                <div class="control-buttons">
+                    <button onclick="startReading()" class="control-btn play">▶️ Start</button>
+                    <button onclick="pauseReading()" class="control-btn pause">⏸️ Pause</button>
+                    <button onclick="resumeReading()" class="control-btn resume">⏯️ Resume</button>
+                    <button onclick="stopReading()" class="control-btn stop">⏹️ Stop</button>
+                    <button onclick="restartReading()" class="control-btn restart">🔄 Restart</button>
+                </div>
+                
+                <!-- Progress Bar -->
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="current-position">0:00</span> / <span id="total-duration">0:00</span>
+                    </div>
+                </div>
+
+                <!-- Speed Control -->
+                <div class="speed-control">
+                    <label>⚡ Reading Speed:</label>
+                    <input type="range" id="speed-slider" min="0.5" max="2" step="0.1" value="1">
+                    <span id="speed-display">1.0x</span>
+                </div>
+
+                <!-- Voice Selection -->
+                <div class="voice-control">
+                    <label>🗣️ Voice:</label>
+                    <select id="voice-select"></select>
+                </div>
+            </div>
+
+            <!-- Text Formatting Controls -->
+            <div class="tool-controls">
+                <h4>📝 Text Formatting</h4>
+                <button onclick="increaseFontSize()">📈 Increase Font</button>
+                <button onclick="decreaseFontSize()">📉 Decrease Font</button>
+                <button onclick="resetFormatting()">🔄 Reset</button>
+                <button onclick="setDyslexiaFont()">📝 Dyslexia Font</button>
+                <button onclick="setOpenDyslexic()">📚 OpenDyslexic</button>
+                <button onclick="toggleHighContrast()">👁️ High Contrast</button>
+            </div>
+
+            <!-- Line Spacing Controls -->
+            <div class="spacing-controls">
+                <h4>📏 Spacing</h4>
+                <button onclick="increaseLineSpacing()">📏 Increase Spacing</button>
+                <button onclick="decreaseLineSpacing()">📐 Decrease Spacing</button>
+                <button onclick="increaseLetterSpacing()">🔤 Increase Letter Space</button>
+                <button onclick="decreaseLetterSpacing()">🔤 Decrease Letter Space</button>
+            </div>
+
+            
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="index.html" class="feature-card" style="display: inline-block;">
+                <div class="icon">🏠</div>
+                <h3>Back to Home</h3>
+            </a>
+        </div>
+    </main>
+
+    <!-- Reading Ruler -->
+    <div id="reading-ruler" class="reading-ruler" style="display: none;"></div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Customize Experience</h3>
+            
+            <label>🌙 Dark Mode:</label>
+            <input type="checkbox" id="dark-mode-toggle">
+            
+            <label>📏 Font Size:</label>
+            <input type="range" id="font-size-slider" min="14" max="24" value="16">
+            <span id="font-size-display">16px</span>
+            
+            <label>🎨 Accent Color:</label>
+            <input type="color" id="accent-color-picker" value="#0056b3">
+            
+            <label>📱 Quick Colors:</label>
+            <div class="color-palette" id="settings-color-palette">
+                <div class="color-swatch" style="background: #0056b3;" onclick="setAccentColor('#0056b3')"></div>
+                <div class="color-swatch" style="background: #00a8cc;" onclick="setAccentColor('#00a8cc')"></div>
+                <div class="color-swatch" style="background: #28a745;" onclick="setAccentColor('#28a745')"></div>
+                <div class="color-swatch" style="background: #ffc107;" onclick="setAccentColor('#ffc107')"></div>
+                <div class="color-swatch" style="background: #dc3545;" onclick="setAccentColor('#dc3545')"></div>
+                <div class="color-swatch" style="background: #6f42c1;" onclick="setAccentColor('#6f42c1')"></div>
+            </div>
+            
+            <button id="reset-settings">🔄 Reset All Settings</button>
+        </div>
+    </div>
+
+    <!-- Include PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Include Tesseract.js for OCR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    
+    <script src="script.js"></script>
+    <script>
+        // ============================================
+        // DYSLEXIA FEATURE - ADVANCED DOCUMENT READER
+        // ============================================
+
+        // Global variables
+        let currentUtterance = null;
+        let isPaused = false;
+        let currentPosition = 0;
+        let totalCharacters = 0;
+        let currentText = '';
+        let voices = [];
+        let progressInterval = null;
+        let currentFile = null;
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVoices();
+            initEventListeners();
+        });
+
+        // ============================================
+        // FILE UPLOAD AND PROCESSING
+        // ============================================
+
+        async function uploadFile() {
+            const fileInput = document.getElementById('file-upload');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file first');
+                return;
+            }
+
+            currentFile = file;
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('file-info').style.display = 'block';
+
+            const fileType = file.name.split('.').pop().toLowerCase();
+            
+            try {
+                showLoading('Processing file...');
+                
+                let extractedText = '';
+                
+                switch(fileType) {
+                    case 'pdf':
+                        extractedText = await processPDF(file);
+                        break;
+                    case 'txt':
+                        extractedText = await processTXT(file);
+                        break;
+                    case 'doc':
+                    case 'docx':
+                        extractedText = await processDOC(file);
+                        break;
+                    case 'jpg':
+                    case 'jpeg':
+                    case 'png':
+                    case 'gif':
+                        extractedText = await processImage(file);
+                        break;
+                    default:
+                        alert('Unsupported file format');
+                        hideLoading();
+                        return;
+                }
+                
+                displayText(extractedText);
+                hideLoading();
+                
+            } catch (error) {
+                console.error('Error processing file:', error);
+                alert('Error processing file. Please try again.');
+                hideLoading();
+            }
+        }
+
+        // Process PDF files
+        async function processPDF(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async function(e) {
+                    try {
+                        const typedarray = new Uint8Array(e.target.result);
+                        
+                        // Load PDF document
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        const numPages = pdf.numPages;
+                        document.getElementById('file-pages').textContent = numPages + ' pages';
+                        
+                        let fullText = '';
+                        
+                        // Extract text from each page
+                        for (let i = 1; i <= numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n\n';
+                        }
+                        
+                        resolve(fullText);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Process Text files
+        async function processTXT(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('file-pages').textContent = '1 document';
+                    resolve(e.target.result);
+                };
+                
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        // Process Word documents (simple version - in production use mammoth.js)
+        async function processDOC(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    document.getElementById('file-pages').textContent = '1 document';
+                    // Simple text extraction - in production use proper DOC parser
+                    resolve('Word document content. Text extraction in progress...');
+                };
+                
+                reader.onerror = reject;
+                reader.readAsText(file);
+            });
+        }
+
+        // Process Images with OCR
+        async function processImage(file) {
+            return new Promise((resolve, reject) => {
+                document.getElementById('file-pages').textContent = '1 image';
+                
+                // Show OCR progress
+                showLoading('Running OCR on image...');
+                
+                Tesseract.recognize(
+                    file,
+                    'eng',
+                    {
+                        logger: m => console.log(m)
+                    }
+                ).then(({ data: { text } }) => {
+                    hideLoading();
+                    resolve(text);
+                }).catch(error => {
+                    hideLoading();
+                    reject(error);
+                });
+            });
+        }
+
+        // Display text in the content area
+        function displayText(text) {
+            const contentDiv = document.getElementById('text-content');
+            contentDiv.innerHTML = text.replace(/\n/g, '<br>');
+            currentText = text;
+            totalCharacters = text.length;
+            
+            // Reset playback
+            stopReading();
+            updateProgress(0);
+            
+            speakText('File loaded successfully. Click Start to begin reading.');
+        }
+
+        // ============================================
+        // TEXT-TO-SPEECH CONTROLS
+        // ============================================
+
+        function startReading() {
+            stopReading(); // Clear any existing speech
+            
+            const text = document.getElementById('text-content').innerText;
+            if (!text || text === 'Upload a file or type/paste text here...') {
+                alert('Please upload a file or enter text first');
+                return;
+            }
+            
+            currentText = text;
+            totalCharacters = text.length;
+            
+            // Get settings
+            const speed = parseFloat(document.getElementById('speed-slider').value);
+            const selectedVoice = document.getElementById('voice-select').value;
+            
+            // Create utterance
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.rate = speed;
+            
+            // Set selected voice
+            const voices = window.speechSynthesis.getVoices();
+            const voice = voices.find(v => v.name === selectedVoice);
+            if (voice) currentUtterance.voice = voice;
+            
+            // Event handlers
+            currentUtterance.onboundary = function(event) {
+                if (event.name === 'word') {
+                    updateProgress(event.charIndex);
+                    highlightWord(event.charIndex, event.charLength);
+                }
+            };
+            
+            currentUtterance.onend = function() {
+                stopReading();
+                updateProgress(totalCharacters);
+                removeHighlight();
+                speakText('Finished reading');
+            };
+            
+            currentUtterance.onerror = function(event) {
+                console.error('Speech error:', event);
+                stopReading();
+            };
+            
+            // Start speaking
+            window.speechSynthesis.speak(currentUtterance);
+            isPaused = false;
+            
+            // Start progress tracking
+            startProgressTracking();
+        }
+
+        function pauseReading() {
+            if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                window.speechSynthesis.pause();
+                isPaused = true;
+                speakText('Paused');
+            }
+        }
+
+        function resumeReading() {
+            if (window.speechSynthesis.paused) {
+                window.speechSynthesis.resume();
+                isPaused = false;
+                speakText('Resumed');
+            } else if (!window.speechSynthesis.speaking && currentText) {
+                // If stopped, start from beginning
+                startReading();
+            }
+        }
+
+        function stopReading() {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            isPaused = false;
+            currentPosition = 0;
+            updateProgress(0);
+            removeHighlight();
+            stopProgressTracking();
+        }
+
+        function restartReading() {
+            stopReading();
+            startReading();
+        }
+
+        // ============================================
+        // PROGRESS TRACKING
+        // ============================================
+
+        function startProgressTracking() {
+            if (progressInterval) clearInterval(progressInterval);
+            
+            progressInterval = setInterval(() => {
+                if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+                    // Update progress based on time (approximate)
+                    const elapsed = Date.now() - (currentUtterance?.startTime || Date.now());
+                    const estimatedProgress = Math.min(100, (elapsed / (totalCharacters * 50)) * 100);
+                    updateProgress(Math.floor((estimatedProgress / 100) * totalCharacters));
+                }
+            }, 100);
+        }
+
+        function stopProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        function updateProgress(position) {
+            currentPosition = position;
+            const progressPercent = (position / totalCharacters) * 100 || 0;
+            
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            
+            // Update time display (rough estimate)
+            const totalSeconds = Math.floor(totalCharacters / 15); // ~15 chars per second
+            const currentSeconds = Math.floor(position / 15);
+            
+            document.getElementById('current-position').textContent = formatTime(currentSeconds);
+            document.getElementById('total-duration').textContent = formatTime(totalSeconds);
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // ============================================
+        // WORD HIGHLIGHTING
+        // ============================================
+
+        function highlightWord(startIndex, length) {
+            removeHighlight();
+            
+            const contentDiv = document.getElementById('text-content');
+            const text = contentDiv.innerText;
+            
+            // Create highlighted HTML
+            const before = text.substring(0, startIndex);
+            const word = text.substring(startIndex, startIndex + length);
+            const after = text.substring(startIndex + length);
+            
+            contentDiv.innerHTML = `${before}<span class="highlight">${word}</span>${after}`;
+            
+            // Scroll to highlighted word
+            const highlighted = document.querySelector('.highlight');
+            if (highlighted) {
+                highlighted.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+
+        function removeHighlight() {
+            const contentDiv = document.getElementById('text-content');
+            const highlighted = document.querySelector('.highlight');
+            if (highlighted) {
+                const text = contentDiv.innerText;
+                contentDiv.innerHTML = text;
+            }
+        }
+
+        // ============================================
+        // VOICE MANAGEMENT
+        // ============================================
+
+        function loadVoices() {
+            voices = window.speechSynthesis.getVoices();
+            const voiceSelect = document.getElementById('voice-select');
+            
+            voiceSelect.innerHTML = '';
+            
+            voices.forEach(voice => {
+                if (voice.lang.includes('en')) {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    voiceSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Update voices when they change
+        window.speechSynthesis.onvoiceschanged = loadVoices;
+
+        // Speed control
+        document.getElementById('speed-slider').addEventListener('input', function(e) {
+            const speed = e.target.value;
+            document.getElementById('speed-display').textContent = speed + 'x';
+            
+            if (currentUtterance) {
+                currentUtterance.rate = speed;
+            }
+        });
+
+        // ============================================
+        // TEXT FORMATTING FUNCTIONS
+        // ============================================
+
+        function increaseFontSize() {
+            const content = document.getElementById('text-content');
+            const currentSize = parseInt(window.getComputedStyle(content).fontSize);
+            content.style.fontSize = (currentSize + 2) + 'px';
+        }
+
+        function decreaseFontSize() {
+            const content = document.getElementById('text-content');
+            const currentSize = parseInt(window.getComputedStyle(content).fontSize);
+            if (currentSize > 12) {
+                content.style.fontSize = (currentSize - 2) + 'px';
+            }
+        }
+
+        function resetFormatting() {
+            const content = document.getElementById('text-content');
+            content.style.fontSize = '18px';
+            content.style.fontFamily = 'Arial, sans-serif';
+            content.style.lineHeight = '1.6';
+            content.style.letterSpacing = 'normal';
+            content.style.wordSpacing = 'normal';
+        }
+
+        function setDyslexiaFont() {
+            const content = document.getElementById('text-content');
+            content.style.fontFamily = 'Comic Sans MS, cursive, sans-serif';
+            content.style.fontSize = '20px';
+            content.style.lineHeight = '2';
+            content.style.letterSpacing = '0.5px';
+        }
+
+        function setOpenDyslexic() {
+            const content = document.getElementById('text-content');
+            content.style.fontFamily = 'OpenDyslexic, Arial, sans-serif';
+            content.style.fontSize = '20px';
+            content.style.lineHeight = '2';
+            content.style.letterSpacing = '0.5px';
+        }
+
+        function increaseLineSpacing() {
+            const content = document.getElementById('text-content');
+            const currentSpacing = parseFloat(content.style.lineHeight) || 1.6;
+            content.style.lineHeight = (currentSpacing + 0.2) + '';
+        }
+
+        function decreaseLineSpacing() {
+            const content = document.getElementById('text-content');
+            const currentSpacing = parseFloat(content.style.lineHeight) || 1.6;
+            if (currentSpacing > 1.2) {
+                content.style.lineHeight = (currentSpacing - 0.2) + '';
+            }
+        }
+
+        function increaseLetterSpacing() {
+            const content = document.getElementById('text-content');
+            const currentSpacing = parseFloat(content.style.letterSpacing) || 0;
+            content.style.letterSpacing = (currentSpacing + 0.5) + 'px';
+        }
+
+        function decreaseLetterSpacing() {
+            const content = document.getElementById('text-content');
+            const currentSpacing = parseFloat(content.style.letterSpacing) || 0;
+            if (currentSpacing > 0) {
+                content.style.letterSpacing = (currentSpacing - 0.5) + 'px';
+            }
+        }
+
+        // ============================================
+        // READING RULER
+        // ============================================
+
+        function toggleRuler() {
+            const ruler = document.getElementById('reading-ruler');
+            if (ruler.style.display === 'none') {
+                ruler.style.display = 'block';
+                speakText('Reading ruler enabled');
+            } else {
+                ruler.style.display = 'none';
+                speakText('Reading ruler disabled');
+            }
+        }
+
+        function rulerColor() {
+            const ruler = document.getElementById('reading-ruler');
+            const colors = ['rgba(255, 255, 0, 0.3)', 'rgba(0, 255, 0, 0.3)', 'rgba(0, 255, 255, 0.3)', 'rgba(255, 0, 255, 0.3)'];
+            const currentColor = ruler.style.backgroundColor;
+            const nextColor = colors[(colors.indexOf(currentColor) + 1) % colors.length] || colors[0];
+            ruler.style.backgroundColor = nextColor;
+        }
+
+        function toggleHighContrast() {
+            document.body.classList.toggle('high-contrast');
+            const isHighContrast = document.body.classList.contains('high-contrast');
+            speakText(isHighContrast ? 'High contrast mode enabled' : 'High contrast mode disabled');
+        }
+
+        // ============================================
+        // LOADING INDICATOR
+        // ============================================
+
+        function showLoading(message) {
+            const loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading-indicator';
+            loadingDiv.className = 'loading-indicator';
+            loadingDiv.innerHTML = `
+                <div class="loading-spinner"></div>
+                <p>${message}</p>
+            `;
+            document.body.appendChild(loadingDiv);
+        }
+
+        function hideLoading() {
+            const loadingDiv = document.getElementById('loading-indicator');
+            if (loadingDiv) {
+                loadingDiv.remove();
+            }
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+
+        function initEventListeners() {
+            document.addEventListener('keydown', function(e) {
+                // Space bar to play/pause
+                if (e.code === 'Space' && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    if (window.speechSynthesis.speaking) {
+                        if (window.speechSynthesis.paused) {
+                            resumeReading();
+                        } else {
+                            pauseReading();
+                        }
+                    } else {
+                        startReading();
+                    }
+                }
+                
+                // Escape to stop
+                if (e.code === 'Escape') {
+                    stopReading();
+                }
+            });
+        }
+
+        // ============================================
+        // ADDITIONAL CSS STYLES
+        // ============================================
+
+        const style = document.createElement('style');
+        style.textContent = `
+            .upload-section {
+                background: var(--bg-color);
+                padding: 20px;
+                border-radius: 10px;
+                margin-bottom: 20px;
+            }
+
+            .upload-controls {
+                display: flex;
+                gap: 10px;
+                margin: 15px 0;
+            }
+
+            .supported-formats {
+                font-size: 0.9em;
+                color: #666;
+                margin-top: 5px;
+            }
+
+            .file-info {
+                background: var(--primary-color);
+                color: white;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            .text-display-area {
+                border: 2px solid var(--primary-color);
+                border-radius: 10px;
+                margin: 20px 0;
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .text-content {
+                padding: 20px;
+                min-height: 200px;
+                font-size: 18px;
+                line-height: 1.8;
+                background: var(--card-bg);
+                color: var(--text-color);
+                outline: none;
+            }
+
+            .highlight {
+                background-color: yellow;
+                color: black;
+                font-weight: bold;
+            }
+
+            .playback-controls {
+                background: var(--bg-color);
+                padding: 20px;
+                border-radius: 10px;
+                margin: 20px 0;
+            }
+
+            .control-buttons {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                margin: 15px 0;
+            }
+
+            .control-btn {
+                padding: 12px 20px;
+                border: none;
+                border-radius: 25px;
+                font-size: 1em;
+                cursor: pointer;
+                transition: var(--transition);
+            }
+
+            .control-btn.play { background: #28a745; color: white; }
+            .control-btn.pause { background: #ffc107; color: black; }
+            .control-btn.resume { background: #17a2b8; color: white; }
+            .control-btn.stop { background: #dc3545; color: white; }
+            .control-btn.restart { background: #6c757d; color: white; }
+
+            .control-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: var(--shadow);
+            }
+
+            .progress-container {
+                margin: 20px 0;
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 10px;
+                background: #ddd;
+                border-radius: 5px;
+                overflow: hidden;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: var(--primary-color);
+                width: 0%;
+                transition: width 0.3s ease;
+            }
+
+            .progress-text {
+                text-align: center;
+                margin-top: 5px;
+                font-size: 0.9em;
+                color: var(--text-color);
+            }
+
+            .speed-control, .voice-control {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 15px 0;
+                justify-content: center;
+            }
+
+            .loading-indicator {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                color: white;
+            }
+
+            .loading-spinner {
+                width: 50px;
+                height: 50px;
+                border: 5px solid #f3f3f3;
+                border-top: 5px solid var(--primary-color);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                margin-bottom: 20px;
+            }
+
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+
+            .reading-ruler {
+                position: fixed;
+                bottom: 20px;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                background: rgba(255, 255, 0, 0.3);
+                pointer-events: none;
+                z-index: 1000;
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                transition: background-color 0.3s ease;
+            }
+
+            body.high-contrast .text-content {
+                background: black;
+                color: yellow;
+                border-color: yellow;
+            }
+
+            body.high-contrast .highlight {
+                background: yellow;
+                color: black;
+            }
+
+            @media (max-width: 768px) {
+                .control-buttons {
+                    flex-wrap: wrap;
+                }
+                
+                .control-btn {
+                    flex: 1 1 calc(50% - 10px);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

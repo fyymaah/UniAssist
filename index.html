@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniAssist - Home</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <!-- SPLASH SCREEN (Shows Only Once on First Visit) -->
+<div id="splash-screen">
+    <h1 class="splash-title">UniAssist</h1>
+    <p>Inclusive Technology for Everyone</p>
+</div>
+    <!-- Header -->
+    <header>
+        <div class="header-customization">
+            <button id="theme-toggle">⚙️ Settings</button>
+        </div>
+        <h1 class="main-title">UniAssist</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <h2>Select an Assistive Tool</h2>
+        <div class="feature-grid">
+            <a href="dyslexia.html" class="feature-card">
+                <div class="icon">📖</div>
+                <h3>Dyslexia Support</h3>
+                <p>Text-to-Speech & Font Adjustments</p>
+            </a>
+            <a href="dysgraphia.html" class="feature-card">
+                <div class="icon">✍️</div>
+                <h3>Dysgraphia Support</h3>
+                <p>Speech-to-Text & Writing Aid</p>
+            </a>
+            <a href="color.html" class="feature-card">
+                <div class="icon">🎨</div>
+                <h3>Color Identification</h3>
+                <p>Image Analysis & Palette Selector</p>
+            </a>
+            <a href="comm.html" class="feature-card">
+                <div class="icon">🗣️</div>
+                <h3>Communication Board</h3>
+                <p>Keyword Speech & Text-to-Speech</p>
+            </a>
+        </div>
+
+        <!-- LOGIN SECTION - NEWLY ADDED -->
+        <div style="margin-top: 50px; text-align: center;">
+            <h2 style="margin-bottom: 20px; color: var(--primary-color);">🔐 Secure Access</h2>
+            <div style="display: flex; justify-content: center;">
+                <a href="login.html" class="feature-card" style="display: inline-block; max-width: 350px; margin: 0 auto; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: white;">
+                    <div class="icon" style="font-size: 4em; margin-bottom: 15px;">👤</div>
+                    <h3 style="color: white; font-size: 1.8em;">Face Login</h3>
+                    <p style="color: rgba(255,255,255,0.9); font-size: 1.1em;">Secure face recognition authentication</p>
+                    <div style="margin-top: 20px; padding: 10px 20px; background: rgba(255,255,255,0.2); border-radius: 30px; display: inline-block;">
+                        ⚡ Click to Login / Register
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats Section - NEWLY ADDED for better UI -->
+        <div class="stats-container" style="margin-top: 60px;">
+            <div class="stat-card">
+                <div class="stat-icon">📚</div>
+                <div class="stat-number">4</div>
+                <div class="stat-label">Assistive Tools</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-number" id="userCount">0</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔐</div>
+                <div class="stat-number" id="loginStatus">Secure</div>
+                <div class="stat-label">Face Login</div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>Customize Experience</h3>
+            
+            <label>🌙 Dark Mode:</label>
+            <input type="checkbox" id="dark-mode-toggle">
+            
+            <label>📏 Font Size:</label>
+            <input type="range" id="font-size-slider" min="14" max="24" value="16">
+            <span id="font-size-display">16px</span>
+            
+            <label>🎨 Accent Color:</label>
+            <input type="color" id="accent-color-picker" value="#0056b3">
+            
+            <label>📱 Quick Colors:</label>
+            <div class="color-palette" id="settings-color-palette">
+                <div class="color-swatch" style="background: #0056b3;" onclick="setAccentColor('#0056b3')"></div>
+                <div class="color-swatch" style="background: #00a8cc;" onclick="setAccentColor('#00a8cc')"></div>
+                <div class="color-swatch" style="background: #28a745;" onclick="setAccentColor('#28a745')"></div>
+                <div class="color-swatch" style="background: #ffc107;" onclick="setAccentColor('#ffc107')"></div>
+                <div class="color-swatch" style="background: #dc3545;" onclick="setAccentColor('#dc3545')"></div>
+                <div class="color-swatch" style="background: #6f42c1;" onclick="setAccentColor('#6f42c1')"></div>
+            </div>
+            
+            <button id="reset-settings">🔄 Reset All Settings</button>
+        </div>
+    </div>
+
+    <!-- Footer - NEWLY ADDED -->
+    <footer style="background: var(--primary-color); color: white; text-align: center; padding: 20px; margin-top: 50px;">
+        <p>© 2026 UniAssist - Inclusive Technology for Everyone</p>
+        <p style="margin-top: 10px; font-size: 0.9em;">✨ Face Recognition Login System Integrated ✨</p>
+    </footer>
+
+    <!-- Splash Screen & Settings Logic -->
+    <script>
+        // ============================================
+        // SPLASH SCREEN LOGIC (Shows Only Once)
+        // ============================================
+        const splashShown = localStorage.getItem('uniassist_splash_shown');
+        
+        if (!splashShown) {
+            // Show splash screen for 3 seconds on first visit
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                    // Mark splash as shown
+                    localStorage.setItem('uniassist_splash_shown', 'true');
+                }, 1000);
+            }, 3000);
+        } else {
+            // Hide splash screen immediately if already shown
+            const splash = document.getElementById('splash-screen');
+            splash.style.display = 'none';
+        }
+
+        // ============================================
+        // SETTINGS MODAL LOGIC
+        // ============================================
+        const modal = document.getElementById('settings-modal');
+        const btn = document.getElementById('theme-toggle');
+        const span = document.getElementsByClassName('close-btn')[0];
+
+        btn.onclick = () => modal.style.display = "block";
+        span.onclick = () => modal.style.display = "none";
+        window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; }
+
+        // Dark Mode
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        darkModeToggle.addEventListener('change', (e) => {
+            document.body.classList.toggle('dark-mode', e.target.checked);
+            localStorage.setItem('uniassist_dark_mode', e.target.checked);
+        });
+
+        // Font Size
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        const fontSizeDisplay = document.getElementById('font-size-display');
+        fontSizeSlider.addEventListener('input', (e) => {
+            const size = e.target.value;
+            document.documentElement.style.setProperty('--font-size', size + 'px');
+            fontSizeDisplay.textContent = size + 'px';
+            localStorage.setItem('uniassist_font_size', size);
+        });
+
+        // Accent Color
+        const accentColorPicker = document.getElementById('accent-color-picker');
+        accentColorPicker.addEventListener('input', (e) => {
+            document.documentElement.style.setProperty('--primary-color', e.target.value);
+            localStorage.setItem('uniassist_accent_color', e.target.value);
+        });
+
+        // Set Accent Color from Palette
+        function setAccentColor(color) {
+            accentColorPicker.value = color;
+            document.documentElement.style.setProperty('--primary-color', color);
+            localStorage.setItem('uniassist_accent_color', color);
+        }
+
+        // Reset Settings
+        document.getElementById('reset-settings').addEventListener('click', () => {
+            document.body.classList.remove('dark-mode');
+            darkModeToggle.checked = false;
+            localStorage.setItem('uniassist_dark_mode', 'false');
+            
+            fontSizeSlider.value = 16;
+            document.documentElement.style.setProperty('--font-size', '16px');
+            fontSizeDisplay.textContent = '16px';
+            localStorage.setItem('uniassist_font_size', '16');
+            
+            accentColorPicker.value = '#0056b3';
+            document.documentElement.style.setProperty('--primary-color', '#0056b3');
+            localStorage.setItem('uniassist_accent_color', '#0056b3');
+            
+            alert('Settings reset to default!');
+        });
+
+        // Load Saved Settings
+        window.addEventListener('load', () => {
+            const savedDarkMode = localStorage.getItem('uniassist_dark_mode');
+            if (savedDarkMode === 'true') {
+                document.body.classList.add('dark-mode');
+                darkModeToggle.checked = true;
+            }
+            
+            const savedFontSize = localStorage.getItem('uniassist_font_size');
+            if (savedFontSize) {
+                fontSizeSlider.value = savedFontSize;
+                document.documentElement.style.setProperty('--font-size', savedFontSize + 'px');
+                fontSizeDisplay.textContent = savedFontSize + 'px';
+            }
+            
+            const savedAccentColor = localStorage.getItem('uniassist_accent_color');
+            if (savedAccentColor) {
+                accentColorPicker.value = savedAccentColor;
+                document.documentElement.style.setProperty('--primary-color', savedAccentColor);
+            }
+
+            // Fetch and display user count from face login system
+            fetchUserCount();
+        });
+
+        // ============================================
+        // NEW FUNCTION: Fetch User Count from Face Login
+        // ============================================
+        async function fetchUserCount() {
+            try {
+                const response = await fetch('http://localhost:3000/users');
+                const users = await response.json();
+                document.getElementById('userCount').textContent = users.length;
+                
+                // Check if user is logged in from session
+                const loggedInUser = sessionStorage.getItem('uniassist_user');
+                if (loggedInUser) {
+                    const user = JSON.parse(loggedInUser);
+                    document.getElementById('loginStatus').innerHTML = `👋 ${user.name}`;
+                }
+            } catch (error) {
+                console.error('Could not fetch user count:', error);
+                document.getElementById('userCount').textContent = '?';
+            }
+        }
+
+        // ============================================
+        // CHECK LOGIN STATUS ON PAGE LOAD
+        // ============================================
+        function checkLoginStatus() {
+            const loggedInUser = sessionStorage.getItem('uniassist_user');
+            if (loggedInUser) {
+                const user = JSON.parse(loggedInUser);
+                // You could add a welcome message or user indicator here
+                console.log(`Welcome back, ${user.name}!`);
+            }
+        }
+
+        // Call checkLoginStatus on load
+        checkLoginStatus();
+
+        // ============================================
+        // ADD LOGOUT FUNCTIONALITY (Optional)
+        // ============================================
+        function logout() {
+            sessionStorage.removeItem('uniassist_user');
+            location.reload();
+        }
+
+        // If you want to add a logout button, uncomment the lines below
+        // and add a logout button in your header
+        /*
+        const logoutBtn = document.createElement('button');
+        logoutBtn.innerHTML = '🚪 Logout';
+        logoutBtn.onclick = logout;
+        logoutBtn.style.marginLeft = '10px';
+        document.querySelector('.header-customization').appendChild(logoutBtn);
+        */
+    </script>
+
+    <!-- Add a small style for the new elements -->
+    <style>
+        /* Additional styles for the new login section */
+        .stats-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 20px 30px;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            min-width: 150px;
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .stat-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+
+        footer {
+            transition: var(--transition);
+        }
+
+        /* Dark mode adjustments */
+        body.dark-mode .stat-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        body.dark-mode footer {
+            background: var(--card-bg);
+            color: var(--text-color);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+    </style>
+    <!-- Add this script for logout functionality -->
+<script>
+    // Check login status and show logout button
+    document.addEventListener('DOMContentLoaded', function() {
+        const loggedInUser = sessionStorage.getItem('uniassist_user');
+        const headerCustomization = document.querySelector('.header-customization');
+        
+        if (loggedInUser && headerCustomization) {
+            const user = JSON.parse(loggedInUser);
+            
+            // Create logout button
+            const logoutBtn = document.createElement('button');
+            logoutBtn.id = 'logout-btn';
+            logoutBtn.innerHTML = '🚪 Logout';
+            logoutBtn.style.marginLeft = '10px';
+            logoutBtn.style.background = '#dc3545';
+            
+            logoutBtn.onclick = function() {
+                sessionStorage.removeItem('uniassist_user');
+                window.location.href = '/login';
+            };
+            
+            headerCustomization.appendChild(logoutBtn);
+            
+            // Add welcome message
+            const welcomeSpan = document.createElement('span');
+            welcomeSpan.style.marginRight = '20px';
+            welcomeSpan.style.color = 'white';
+            welcomeSpan.style.fontWeight = '600';
+            welcomeSpan.innerHTML = `👋 ${user.name} ${user.role === 'admin' ? '👑' : ''}`;
+            
+            headerCustomization.insertBefore(welcomeSpan, headerCustomization.firstChild);
+        }
+    });
+</script>
+</body>
+</html>
