@@ -681,9 +681,41 @@
                 gap: 10px;
             }
         }
+        /* Splash Screen */
+#splash-screen{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:linear-gradient(135deg,#667eea,#764ba2);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    z-index:9999;
+    transition:opacity 0.8s ease;
+}
+
+#splash-screen h1{
+    font-size:60px;
+    margin-bottom:10px;
+}
+
+#splash-screen p{
+    font-size:22px;
+}
     </style>
 </head>
 <body>
+    <body>
+
+<!-- Splash Screen -->
+<div id="splash-screen">
+    <h1>UniAssist</h1>
+    <p>Inclusive Technology for Everyone</p>
+</div>
     <div class="login-container">
         <div class="logo">
             <h1>Uni<span>Assist</span></h1>
@@ -1521,5 +1553,18 @@
             }
         };
     </script>
+        <script>
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        const splash = document.getElementById("splash-screen");
+        splash.style.opacity = "0";
+
+        setTimeout(() => {
+            splash.style.display = "none";
+        }, 800);
+
+    }, 2500);
+});
+</script>
 </body>
 </html>
