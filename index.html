@@ -12,11 +12,6 @@ if (!sessionStorage.getItem("uniassist_user")) {
 </script>
 </head>
 <body>
-   <!-- SPLASH SCREEN (Shows Only Once on First Visit) -->
-<div id="splash-screen">
-    <h1 class="splash-title">UniAssist</h1>
-    <p>Inclusive Technology for Everyone</p>
-</div>
     <!-- Header -->
     <header>
         <div class="header-customization">
@@ -122,30 +117,8 @@ if (!sessionStorage.getItem("uniassist_user")) {
         <p style="margin-top: 10px; font-size: 0.9em;">✨ Face Recognition Login System Integrated ✨</p>
     </footer>
 
-    <!-- Splash Screen & Settings Logic -->
+  
     <script>
-        // ============================================
-        // SPLASH SCREEN LOGIC (Shows Only Once)
-        // ============================================
-        const splashShown = localStorage.getItem('uniassist_splash_shown');
-        
-        if (!splashShown) {
-            // Show splash screen for 3 seconds on first visit
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.style.opacity = '0';
-                setTimeout(() => {
-                    splash.style.display = 'none';
-                    // Mark splash as shown
-                    localStorage.setItem('uniassist_splash_shown', 'true');
-                }, 1000);
-            }, 3000);
-        } else {
-            // Hide splash screen immediately if already shown
-            const splash = document.getElementById('splash-screen');
-            splash.style.display = 'none';
-        }
-
         // ============================================
         // SETTINGS MODAL LOGIC
         // ============================================
