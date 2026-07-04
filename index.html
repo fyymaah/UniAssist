@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UniAssist - Home</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+if (!sessionStorage.getItem("uniassist_user")) {
+    window.location.replace("/login.html");
+}
+</script>
 </head>
 <body>
    <!-- SPLASH SCREEN (Shows Only Once on First Visit) -->
@@ -251,13 +256,16 @@
         // CHECK LOGIN STATUS ON PAGE LOAD
         // ============================================
         function checkLoginStatus() {
-            const loggedInUser = sessionStorage.getItem('uniassist_user');
-            if (loggedInUser) {
-                const user = JSON.parse(loggedInUser);
-                // You could add a welcome message or user indicator here
-                console.log(`Welcome back, ${user.name}!`);
-            }
-        }
+    const loggedInUser = sessionStorage.getItem('uniassist_user');
+
+    if (!loggedInUser) {
+        window.location.href = "/login.html";
+        return;
+    }
+
+    const user = JSON.parse(loggedInUser);
+    console.log(`Welcome back, ${user.name}!`);
+}
 
         // Call checkLoginStatus on load
         checkLoginStatus();
