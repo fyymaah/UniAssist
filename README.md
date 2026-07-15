@@ -11,7 +11,8 @@ Features
 - Color Identification: Image Upload Color Detection, Color Palette Selector
 - Communication Board: Keyword Speech, Text-to-Speech
 - Customization: Dark Mode, Font Size, Accent Colors
-- 
+- Face recognition login
+  
  Technologies Used
 
 - HTML
